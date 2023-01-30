@@ -30,7 +30,8 @@ class Bullet:
             self.isAlive = False 
             self.xpos = xpos
             self.ypos = ypos
-        
+    
+   
         
         
     def draw(self):
@@ -62,12 +63,11 @@ class Alien:
         
         if timer % 350 == 0:
             self.xpos+=20*self.direction
-            #print("Moving right")
         return timer
     
     def collide (self, BulletX, BulletY):
         if self.isAlive:
-            if (BulletX > self.xpos and BulletX < self.xpos + 40 and BulletY < self.ypos + 40):
+            if (BulletX > self.xpos-7 and BulletX < self.xpos + 40 and BulletY < self.ypos + 40):
                 print("hit!")
                 self.isAlive = False
                 return False
@@ -138,7 +138,7 @@ while not gameover: #GAME LOOP--------------------------------------------------
         if bullet.isAlive == True:
             #check for collision between bullet and enemy
             for i in range (len(armada)): #check bullet with entire armada's position
-                bullet.isAlive == armada[i].collide(bullet.xpos, bullet.ypos) #if we hit, set bullet to false
+                bullet.isAlive = armada[i].collide(bullet.xpos, bullet.ypos) #if we hit, set bullet to false
                 if bullet.isAlive == False:
                     break
         
