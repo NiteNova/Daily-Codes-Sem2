@@ -10,7 +10,7 @@ pygame.display.set_caption("Valentine's day card") #sets the window title
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((800, 800)) #creates game screen
 font = pygame.font.Font('freesansbold.ttf', 32) #load font
-img = pygame.image.load("dog.jpg") #make sure this is saved to the same folder as your code
+
 
 windowOpen = True
 
