@@ -6,9 +6,10 @@ pygame.init()
 pygame.display.set_caption("Space Invaders!")
 screen = pygame.display.set_mode((800, 800))
 clock = pygame.time.Clock()
-gameover = False
+
 
 #game variables
+gameover = False
 timer = 0;
 
 #player variables
@@ -17,6 +18,9 @@ ypos = 750
 moveLeft = False
 moveRight = False
 shoot = False
+playerDead = False
+Lives = 3
+
 
 #Bullet Class
 class Bullet:
@@ -35,7 +39,8 @@ class Bullet:
     
 
     def draw(self):
-        pygame.draw.rect(screen, (250, 250, 250), (self.xpos-3, self.ypos-50, 10, 20))
+        if self.isAlive == True:
+            pygame.draw.rect(screen, (250, 250, 250), (self.xpos-3, self.ypos-50, 10, 20))
         
 bullet = Bullet(xpos+28, ypos)
 
@@ -48,7 +53,7 @@ class missile:
 
     def move(self, xpos, ypos):
         if self.isAlive == True:
-            self.ypos += 5
+            self.ypos += 3
         if self.ypos > 800:
             self.isAlive = False
             self.xpos = xpos - 10
@@ -57,8 +62,6 @@ class missile:
     def draw(self):
         if self.isAlive == True:
             pygame.draw.rect(screen, (250, 100, 0), (self.xpos, self.ypos, 10, 20))
-
-
 
 #Enemy Class 
 class Alien: 
@@ -74,7 +77,7 @@ class Alien:
         
     def move(self, timer):
         #print("timer in function is", timer)
-        if timer % 650 == 0:
+        if timer % 700 == 0:
             self.ypos+= 100
             self.direction *=-1
             return 0
@@ -110,11 +113,11 @@ class Walls:
         
     
     def collide(self, BulletX, BulletY):
-        if self.numHits < 3:
-            if (BulletX > self.xpos-10 and BulletX < self.xpos + 30 and BulletY < self.ypos+15):
+        if self.numHits <= 3:
+            if (BulletX > self.xpos-10 and BulletX < self.xpos + 30 and BulletY < self.ypos+15 and BulletY > self.ypos):
                 print("hit!")
                 self.numHits += 1
-                return self.numHits 
+                return False
         return True
 
 missiles = []
@@ -134,6 +137,8 @@ for m in range (4): #handles rows
     for n in range (9): #handles columns
         armada.append(Alien(n*80+50, m*60+50))
 
+if Lives == 0:
+    gameover = True
 
 while not gameover: #GAME LOOP------------------------------------------------------------------------------------
     clock.tick(60)#fps
@@ -170,14 +175,7 @@ while not gameover: #GAME LOOP--------------------------------------------------
 
     
     #Physics Section -----------------------------------------------------------
-    if moveLeft == True:
-        vx =- 5
-    elif moveRight == True:
-        vx = 5
-    else:
-        vx = 0
-    #update player position
-    xpos += vx    
+
     
     #Alien movement
     for i in range (len(armada)):
@@ -197,9 +195,28 @@ while not gameover: #GAME LOOP--------------------------------------------------
                     missiles[i].xpos = armada[pick].xpos+5
                     missiles[i].ypos = armada[pick].ypos
                     break
-                    
-    
-    
+                
+    for i in range (len(walls)):
+        for t in range (len(missiles)):
+            if missiles[t].isAlive == True:
+                if walls[i].collide(missiles[t].xpos, missiles[t].ypos) == False:
+                    missiles[t].isAlive = False
+                    break
+                            
+    for g in range (len(missiles)):
+        if missiles[g].isAlive:
+            if missiles[g].xpos > xpos - 10 and missiles[g].xpos < xpos + 60 and missiles[g].ypos < ypos + 20 and missiles[g].ypos > ypos - 20:
+                print("player hit)")
+                playerDead = True
+                break
+            
+    for z in range (len(armada)):
+        if armada[z].isAlive:
+            if armada[z].ypos > 720:
+                print("Good bye)")
+                gameover = True
+                break
+            
     #shoot bullet
     if shoot == True:
         bullet.isAlive = True
@@ -219,23 +236,47 @@ while not gameover: #GAME LOOP--------------------------------------------------
                 bullet.isAlive = walls[i].collide(bullet.xpos, bullet.ypos) #if we hit, set bullet to false
                 if bullet.isAlive == False:
                     break
-        
     else:
         bullet.xpos = xpos + 28
         bullet.ypos = ypos
     
+    
+    
+    if moveLeft == True:
+        vx =- 5
+    elif moveRight == True:
+        vx = 5
+    else:
+        vx = 0
+    #update player position
+    xpos += vx    
     #Render Section ------------------------------------------------------------
     screen.fill((0, 0, 0))
+    my_font = pygame.font.SysFont('Comic Sans MS', 30)
+    text_surface = my_font.render('LIVES:', False, (255, 255, 255))
+    text_surface2 = my_font.render(str(int(Lives)), 1, (255, 0, 0))
+    screen.blit(text_surface, (0,0))
+    screen.blit(text_surface2, (120,0))
     
     #Draws the player
-    pygame.draw.rect(screen, (50, 205, 0), (xpos, ypos, 60, 20))
-    pygame.draw.rect(screen, (50, 205, 0), (xpos+5, ypos-10, 50, 20))
-    pygame.draw.rect(screen, (50, 205, 0), (xpos+22, ypos-25, 15, 25))
-    pygame.draw.rect(screen, (50, 205, 0), (xpos+27, ypos-35, 5, 10))
+    if playerDead == False:
+        pygame.draw.rect(screen, (50, 205, 0), (xpos, ypos, 60, 20))
+        pygame.draw.rect(screen, (50, 205, 0), (xpos+5, ypos-10, 50, 20))
+        pygame.draw.rect(screen, (50, 205, 0), (xpos+22, ypos-25, 15, 25))
+        pygame.draw.rect(screen, (50, 205, 0), (xpos+27, ypos-35, 5, 10))
+    
+    if playerDead == True:
+        xpos = 1000
+        ypos = 1000
+        Lives -= 1
+        playerDead = False
+        pygame.time.wait(5000)
+        xpos = 400
+        ypos = 750
     
     bullet.draw()
     
-    #Draws the missiles
+
     for p in range(len(missiles)):
         missiles[p].draw()
     
