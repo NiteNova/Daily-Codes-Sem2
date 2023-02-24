@@ -137,7 +137,7 @@ for m in range (4): #handles rows
     for n in range (9): #handles columns
         armada.append(Alien(n*80+50, m*60+50))
 
-if Lives == 0:
+if Lives <= 0:
     gameover = True
 
 while not gameover: #GAME LOOP------------------------------------------------------------------------------------
