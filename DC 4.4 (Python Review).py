@@ -60,8 +60,7 @@ marbles = [4, 6, 2, 9]
 print("Current Marbles", marbles)
 print("Second element is", marbles[1])
 for i in range(len(marbles)):
-    guh = marbles[i]
-    marbles[i] = guh * 2
+    marbles[i] *= 5
 print("New Marbles:",marbles)
 
 print()
