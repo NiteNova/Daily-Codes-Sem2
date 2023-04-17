@@ -28,14 +28,21 @@ wah = []
 for p in range(11):
     wah.append(random.randrange(1, 101))
 print("Medium List:", wah)
+
+print()
 for j in range(len(wah)):
-    already_sorted = True
-    for i in range(len(wah) - j - 1):
-        if wah[i] > wah[i + 1]:
-            wah[i] = wah[i + 1]
-            already_sorted = False
-    if already_sorted == True:
+    swapped = False
+    for i in range(len(wah)-1):
+        if wah[i] > wah[i+1]:
+            wah[i], wah[i+1] = wah[i+1], wah[i]
+            swapped = True
+            
+    if swapped == False:
         break
+
+print("New Medium List:", wah)
+
+
         
         
 print(wah)
